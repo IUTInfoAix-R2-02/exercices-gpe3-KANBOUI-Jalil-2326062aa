@@ -18,26 +18,20 @@ public class Palette extends Application {
     private int nbRouge = 0;
     private int nbBleu = 0;
 
-    private Button vert;
-    private Button rouge;
-    private Button bleu;
-
-    private BorderPane root;
     private Label label;
     private Pane panneau;
-    private HBox bas;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        root = new BorderPane();
+        BorderPane root = new BorderPane();
 
 
-        vert = new Button("Vert");
-        rouge = new Button("Rouge");
-        bleu = new Button("Bleu");
+        Button vert = new Button("Vert");
+        Button rouge = new Button("Rouge");
+        Button bleu = new Button("Bleu");
 
-        bas = new HBox(10);
-        bas.getChildren().addAll(vert,rouge,bleu);
+        HBox bas = new HBox(10);
+        bas.getChildren().addAll(vert, rouge, bleu);
         bas.setAlignment(Pos.CENTER);
         bas.setPadding(new Insets(10));
 
