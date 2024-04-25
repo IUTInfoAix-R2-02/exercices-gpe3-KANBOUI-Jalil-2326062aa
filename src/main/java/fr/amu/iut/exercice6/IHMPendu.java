@@ -21,10 +21,30 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class IHMPendu extends Application {
 
     private int nbVie = 7;
     private Label nombreVie;
+    private String etoileComplet;
+    private Label motInconnu;
+    private Dico dico = new Dico();
+    private String motATrouver;
+    private ImageView imageView;
+
+
+
+    private Image pendu7 = new Image("/exercice6/pendu7.png");
+    private Image pendu6 = new Image("/exercice6/pendu6.png");
+    private Image pendu5 = new Image("/exercice6/pendu5.png");
+    private Image pendu4 = new Image("/exercice6/pendu4.png");
+    private Image pendu3 = new Image("/exercice6/pendu3.png");
+    private Image pendu2 = new Image("/exercice6/pendu2.png");
+    private Image pendu1 = new Image("/exercice6/pendu1.png");
+    private Image pendu0 = new Image("/exercice6/pendu0.png");
+    private Image penduWin = new Image("/exercice6/penduWin.png");
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Jeu du pendu");
@@ -33,25 +53,16 @@ public class IHMPendu extends Application {
 
         // A completer
 
-        Dico dico = new Dico();
-        String motATrouver = dico.getMot();
+        nouveauMotEtEtoile();
 
         Pane root = new Pane();
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         root.setStyle("-fx-background-color: #ccfcee");
 
-        Image pendu7 = new Image("/exercice6/pendu7.png");
-        Image pendu6 = new Image("/exercice6/pendu6.png");
-        Image pendu5 = new Image("/exercice6/pendu5.png");
-        Image pendu4 = new Image("/exercice6/pendu4.png");
-        Image pendu3 = new Image("/exercice6/pendu3.png");
-        Image pendu2 = new Image("/exercice6/pendu2.png");
-        Image pendu1 = new Image("/exercice6/pendu1.png");
-        Image pendu0 = new Image("/exercice6/pendu0.png");
-        Image penduWin = new Image("/exercice6/penduWin.png");
 
-        ImageView imageView = new ImageView(pendu0);
+
+        imageView = new ImageView(pendu0);
         imageView.setLayoutX(160);
         imageView.setLayoutY(50);
 
@@ -107,26 +118,51 @@ public class IHMPendu extends Application {
         nombreVie.setLayoutY(220);
 
         Button[] boutons = {a, e, i, o, u, y, b, c, d, f, g, h, j, k, l, m, n, p, q, r, s, t, v, w, x, z};
+
+        for (int compteur = 0 ; compteur < boutons.length ; compteur ++){
+            styleButton(boutons[compteur]);
+        }
+
+
         for (Button bouton : boutons) {
             bouton.addEventHandler(MouseEvent.MOUSE_CLICKED, actionEvent -> {
                 Button source = (Button) actionEvent.getSource();
                 char lettre = source.getText().charAt(0);
+                char[] temp = etoileComplet.toCharArray();
 
                 if (dico.getPositions(lettre,motATrouver).isEmpty()) {
                     nbVie -= 1;
-                    System.out.println(nbVie);
                     changerImage(pendu7, pendu6, pendu5, pendu4, pendu3, pendu2, pendu1, pendu0, imageView);
                     nombreVie.setText("Nombre de vie : "+nbVie);
 
                 }
-
-                System.out.println(dico.getPositions(lettre,motATrouver));
+                else {
+                    ArrayList<Integer> positions = dico.getPositions(lettre,motATrouver);
+                    for( int compteur = 0 ; compteur < positions.size() ; compteur ++){
+                        if (temp[positions.get(compteur)] == lettre){
+                            break;
+                        }
+                        else {
+                            temp [positions.get(compteur)] = lettre;
+                        }
+                    }
+                    etoileComplet = new String(temp);
+                    motInconnu.setText(etoileComplet);
+                }
+                if (motATrouver.equals(etoileComplet) && nbVie > 0 ){
+                    imageView.setImage(penduWin);
+                }
             });
         }
 
         Button rejouer = new Button("Rejouer");
-        rejouer.setLayoutX(220);
-        rejouer.setLayoutY(400);
+        rejouer.setLayoutX(180);
+        rejouer.setLayoutY(450);
+        rejouer.setStyle("-fx-font-weight: bold; -fx-background-color:rgb(202,250,237); -fx-text-fill: #e8c1a0; -fx-font-size: 16px; -fx-border-color: #79d5cc; -fx-border-radius: 50; -fx-border-width: 2; -fx-min-height: 45; -fx-min-width: 120; -fx-max-height: 45;-fx-max-width: 120");
+
+        rejouer.addEventHandler(MouseEvent.MOUSE_CLICKED, actionEvent -> {
+                relancer();
+        });
 
 
 
@@ -134,11 +170,7 @@ public class IHMPendu extends Application {
 
 
 
-        String etoileComplet = "";
-        for (int compteur = 0; compteur < motATrouver.length() ; compteur++){
-            etoileComplet += "*";
-        }
-        Label motInconnu = new Label(etoileComplet);
+        motInconnu = new Label(etoileComplet);
         motInconnu.setStyle("-fx-font-weight: bold");
         motInconnu.setLayoutY(250);
         motInconnu.setFont(new Font(20));
@@ -148,6 +180,22 @@ public class IHMPendu extends Application {
 
 
         primaryStage.show();
+    }
+
+    private void relancer() {
+        nouveauMotEtEtoile();
+        motInconnu.setText(etoileComplet);
+        nbVie = 7;
+        nombreVie.setText("Nombre de vie : "+nbVie);
+        changerImage(pendu7, pendu6, pendu5, pendu4, pendu3, pendu2, pendu1, pendu0, imageView);
+    }
+
+    private void nouveauMotEtEtoile() {
+        motATrouver = dico.getMot();
+        etoileComplet = "";
+        for (int compteur = 0; compteur < motATrouver.length() ; compteur++){
+            etoileComplet += "*";
+        }
     }
 
     private void changerImage(Image pendu7, Image pendu6, Image pendu5, Image pendu4, Image pendu3, Image pendu2, Image pendu1, Image pendu0, ImageView imageView) {
@@ -177,6 +225,15 @@ public class IHMPendu extends Application {
                 imageView.setImage(pendu7);
                 break;
         }
+    }
+
+
+
+
+
+    public void styleButton(Button b1) {
+        b1.setStyle("-fx-font-weight: bold; -fx-background-color:rgb(202,250,237); -fx-text-fill: #79d5cc; -fx-font-size: 16px; -fx-border-color: #e8c1a0; -fx-border-radius: 5; -fx-border-width: 2; -fx-min-height: 45; -fx-min-width: 45; -fx-max-height: 45;-fx-max-width: 45");
+
     }
 
     public static void main(String[] args) {
