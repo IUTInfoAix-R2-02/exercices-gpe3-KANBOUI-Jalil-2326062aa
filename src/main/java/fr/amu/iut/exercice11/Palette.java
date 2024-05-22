@@ -1,15 +1,19 @@
-package fr.amu.iut.exercice1;
+package fr.amu.iut.exercice11;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -34,11 +38,21 @@ public class Palette extends Application {
     private Label texteDuBas;
 
 
+    private IntegerProperty nbFois;
+    private StringProperty message;
+    private StringProperty couleurPanneau;
+
+    public Palette() {
+        nbFois = new SimpleIntegerProperty(0);
+        message = new SimpleStringProperty ("");
+        couleurPanneau = new SimpleStringProperty("#000000");
+    }
+
     @Override
     public void start(Stage primaryStage) {
         root = new BorderPane();
 
-        texteDuHaut = new Label();
+        texteDuHaut = new Label("Cliquez sur un bouton");
         texteDuHaut.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         BorderPane.setAlignment(texteDuHaut, Pos.CENTER);
 
@@ -57,7 +71,33 @@ public class Palette extends Application {
         rouge = new Button("Rouge");
         bleu = new Button("Bleu");
 
-        /* VOTRE CODE ICI */
+
+
+
+        vert.setOnAction(actionEvent -> {
+            nbVert ++;
+            nbFois.setValue(nbVert);
+            message.setValue("Vert");
+            couleurPanneau.setValue("GREEN");
+        });
+
+        rouge.setOnAction(actionEvent -> {
+            nbRouge ++;
+            nbFois.setValue(nbRouge);
+            message.setValue("Rouge");
+            couleurPanneau.setValue("RED");
+        });
+
+        bleu.setOnAction(event -> {
+            nbBleu ++;
+            nbFois.setValue(nbBleu);
+            message.setValue("Bleu");
+            couleurPanneau.setValue("BLUE");
+        });
+
+        texteDuHaut.textProperty().bind(Bindings.when(nbFois.isNotEqualTo(0)).then(Bindings.concat(message," choisi ", nbFois, " fois")).otherwise("Cliquez sur un bouton"));
+        panneau.styleProperty().bind(Bindings.concat("-fx-background-color: ", couleurPanneau));
+
 
         boutons.getChildren().addAll(vert, rouge, bleu);
 
@@ -69,6 +109,16 @@ public class Palette extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void createBindings(){
+        BooleanProperty pasEncoreDeClick = null;
+        if (nbFois.isEqualTo(0)){
+            pasEncoreDeClick.setValue(true);
+        }
+        else {
+            pasEncoreDeClick.setValue(false);
+        }
     }
 }
 
