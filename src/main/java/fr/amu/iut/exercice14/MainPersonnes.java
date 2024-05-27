@@ -1,15 +1,18 @@
-package fr.amu.iut.exercice4;
+package fr.amu.iut.exercice14;
 
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 @SuppressWarnings("Duplicates")
 public class MainPersonnes {
 
-    private static SimpleListProperty<Personne> lesPersonnes;
+    private static ObservableList<Personne> lesPersonnes;
     private static IntegerProperty ageMoyen;
     private static IntegerProperty nbParisiens;
 
@@ -18,12 +21,64 @@ public class MainPersonnes {
 
     public static void main(String[] args) {
 
-        lesPersonnes = new SimpleListProperty<>(FXCollections.observableArrayList());
+        lesPersonnes = FXCollections.observableArrayList(personne -> new Observable[]{personne.ageProperty(),personne.villeDeNaissanceProperty()});
         ageMoyen = new SimpleIntegerProperty(0);
+        nbParisiens = new SimpleIntegerProperty(0);
+
+        calculerAgeMoyen();
+        calculerNbParisiens();
 
         question1();
-//        question2();
+        question2();
     }
+
+
+    private static void calculerAgeMoyen() {
+        calculAgeMoyen = Bindings.createIntegerBinding(() -> {
+            int sum = 0;
+            if (!lesPersonnes.isEmpty()){
+                for (Personne personne : lesPersonnes) {
+                    sum += personne.getAge();
+                }
+                return sum / lesPersonnes.size();
+            }
+            else {
+                return 0;
+            }
+        }, lesPersonnes);
+
+
+        calculAgeMoyen.addListener((observable, oldValue, newValue) -> {
+            ageMoyen.set(newValue.intValue());
+        });
+
+        ageMoyen.set(calculAgeMoyen.get());
+    }
+
+    private static void calculerNbParisiens() {
+        calculnbParisiens = Bindings.createIntegerBinding(() -> {
+            int compteur = 0;
+            if (!lesPersonnes.isEmpty()){
+                for (Personne personne : lesPersonnes){
+                    if ("Paris".equals(personne.getVilleDeNaissance())) {
+                        compteur += 1;
+                    }
+                }
+                return compteur;
+            }
+            else {
+                return 0;
+            }
+        }, lesPersonnes);
+
+        calculnbParisiens.addListener((observable, oldValue, newValue) -> {
+            nbParisiens.set(newValue.intValue());
+        });
+
+        nbParisiens.setValue(calculnbParisiens.getValue());
+    }
+
+
 
     public static void question1() {
         System.out.println("1 - L'age moyen est de " + ageMoyen.getValue() + " ans");
